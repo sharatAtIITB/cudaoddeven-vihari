@@ -32,21 +32,18 @@ const int RMAX = 100;
 const int RMAX = 10000000; // 10 million
 #endif
 
-int thread_count;
+int num_blocks, threads_per_block;
+
+//extern void serial(int* a, int nsize);
+extern void ansA(int* a, int nsize, int num_blocks, int therads_per_block);
 
 void Usage(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p);
 void Generate_list(int a[], int n);
-void Print_list(int a[], int n, char* title);
+void Print_list(int a[], int n, const char* title);
 void Read_list(int a[], int n);
 void Odd_even(int a[], int n);
 void swap(int a[], int i, int j);
-
-inline void swap(int a[], int i, int j){
-  int temp = a[i];
-  a[i] = a[j];
-  a[j] = temp;
-}
 
 /*-----------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
@@ -104,7 +101,15 @@ void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
     Usage(argv[0]);
     exit(0);
   }
-  thread_count = strtol(argv[1], NULL, 10);
+  int thread_c = strtol(argv[1], NULL, 10);
+  num_blocks = 1;
+  if (thread_c>1024){
+    num_blocks = thread_c/1024;
+    threads_per_block = 1024;
+  }
+  else
+    threads_per_block = thread_c;
+
   *n_p = strtol(argv[2], NULL, 10);
   *g_i_p = argv[3][0];
 
@@ -135,7 +140,7 @@ void Generate_list(int a[], int n) {
  * Purpose:   Print the elements in the list
  * In args:   a, n
  */
-void Print_list(int a[], int n, char* title) {
+void Print_list(int a[], int n, const char* title) {
   int i;
 
   printf("%s:\n", title);
@@ -167,19 +172,7 @@ void Read_list(int a[], int n) {
  * In/out args:  a
  */
 void Odd_even(int a[], int n) {
-  int is_sorted = 1;
-  do{
-    is_sorted = 1;
-    for(int i=0;i<n;i+=2)
-      if (a[i]>a[i+1]){
-	shuffle(a, i, i+1);
-	is_sorted = 0;
-      }
-    for(int i=0;i<n;i+=2)
-      if (a[i]>a[i+1]){
-	shuffle(a, i, i+1);
-	is_sorted = 0;
-      }
-  } while(is_sorted==0);  
+  ansA(a, n, num_blocks, threads_per_block);
+  //serial(a, n);
 }  /* Odd_even */
 
