@@ -3,7 +3,7 @@
  * Purpose: Use odd-even transposition sort to sort a list of ints.
  *
  * Compile: gcc -g -Wall -fopenmp -o omp_odd_even1 omp_odd_even1.c
- * Usage:   ./omp_odd_even1 <thread count> <n> <g|i>
+ * Usage:   ./omp_odd_even1 <num blocks> <threads per block> <n> <g|i>
  *             n:   number of elements in list
  *            'g':  generate list using a random number generator
  *            'i':  user input list
@@ -32,7 +32,7 @@ const int RMAX = 100;
 const int RMAX = 10000000; // 10 million
 #endif
 
-int thread_count;
+int num_blocks, threads_per_block;
 
 void Usage(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p);
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
  * Purpose:   Summary of how to run program
  */
 void Usage(char* prog_name) {
-  fprintf(stderr, "usage:   %s <thread count> <n> <g|i>\n", prog_name);
+  fprintf(stderr, "usage:   %s <num blocks> <threads per block> <n> <g|i>\n", prog_name);
   fprintf(stderr, "   n:   number of elements in list\n");
   fprintf(stderr, "  'g':  generate list using a random number generator\n");
   fprintf(stderr, "  'i':  user input list\n");
@@ -100,13 +100,14 @@ void Usage(char* prog_name) {
  * Out args:  n_p, g_i_p
  */
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
-  if (argc != 4 ) {
+  if (argc != 5 ) {
     Usage(argv[0]);
     exit(0);
   }
-  thread_count = strtol(argv[1], NULL, 10);
-  *n_p = strtol(argv[2], NULL, 10);
-  *g_i_p = argv[3][0];
+  num_blocks = strtol(argv[1], NULL, 10);
+  threads_per_block = strtol(argv[2], NULL, 10);
+  *n_p = strtol(argv[3], NULL, 10);
+  *g_i_p = argv[4][0];
 
   if (*n_p <= 0 || (*g_i_p != 'g' && *g_i_p != 'i') ) {
     Usage(argv[0]);
@@ -172,12 +173,12 @@ void Odd_even(int a[], int n) {
     is_sorted = 1;
     for(int i=0;i<n;i+=2)
       if (a[i]>a[i+1]){
-	shuffle(a, i, i+1);
+	swap(a, i, i+1);
 	is_sorted = 0;
       }
-    for(int i=0;i<n;i+=2)
+    for(int i=1;i<n;i+=2)
       if (a[i]>a[i+1]){
-	shuffle(a, i, i+1);
+	swap(a, i, i+1);
 	is_sorted = 0;
       }
   } while(is_sorted==0);  
