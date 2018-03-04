@@ -32,10 +32,11 @@ const int RMAX = 100;
 const int RMAX = 10000000; // 10 million
 #endif
 
-int num_blocks, threads_per_block;
+int num_threads;
 
 //extern void serial(int* a, int nsize);
-extern void ansA(int* a, int nsize, int num_blocks, int therads_per_block);
+extern void ansA(int* a, int nsize, int num_threads);
+extern void ansB(int* a, int nsize, int num_threads);
 
 void Usage(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p);
@@ -101,14 +102,7 @@ void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
     Usage(argv[0]);
     exit(0);
   }
-  int thread_c = strtol(argv[1], NULL, 10);
-  num_blocks = 1;
-  if (thread_c>1024){
-    num_blocks = thread_c/1024;
-    threads_per_block = 1024;
-  }
-  else
-    threads_per_block = thread_c;
+  num_threads = strtol(argv[1], NULL, 10);
 
   *n_p = strtol(argv[2], NULL, 10);
   *g_i_p = argv[3][0];
@@ -172,7 +166,9 @@ void Read_list(int a[], int n) {
  * In/out args:  a
  */
 void Odd_even(int a[], int n) {
-  ansA(a, n, num_blocks, threads_per_block);
   //serial(a, n);
+  //ansA(a, n, num_threads);
+  ansB(a, n, num_threads);
+  
 }  /* Odd_even */
 

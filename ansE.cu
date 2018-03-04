@@ -3,7 +3,7 @@
 
 extern __device__ __host__ inline void swap(int a[], int i, int j);
 
-__global__ void _ansA(int* data, int n, int* sorted, int odd){
+__global__ void _ansC(int* data, int n, int* sorted, int odd){
   int tid = blockDim.x * blockIdx.x + threadIdx.x;
   if (tid%2 != odd)
     return;
@@ -13,9 +13,11 @@ __global__ void _ansA(int* data, int n, int* sorted, int odd){
   }
 }
 
-void ansA(int* data, int nsize, int num_workers){
-  int num_blocks = num_workers;
-  int threads_per_block = 1;
+void ansC(int* data, int nsize, int num_workers){
+  int num_blocks = 16;
+  int threads_per_block = 1024;
+  int nsize = 16*1024*1024;
+
   int* dd;
   int is_sorted = 1;
   int *dsorted;
@@ -31,6 +33,7 @@ void ansA(int* data, int nsize, int num_workers){
   do{
     cudaMemset(dsorted, 1, sizeof(int));
     _ansA <<< num_blocks, threads_per_block>>> (dd, nsize, dsorted, 0);
+    checkErrors("Failed to allocate");
     _ansA <<< num_blocks, threads_per_block>>> (dd, nsize, dsorted, 1);
     cudaMemcpy(&is_sorted, dsorted, sizeof(int), cudaMemcpyDeviceToHost);
   }while(is_sorted==0);

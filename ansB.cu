@@ -13,9 +13,10 @@ __global__ void _ansA(int* data, int n, int* sorted, int odd){
   }
 }
 
-void ansA(int* data, int nsize, int num_workers){
-  int num_blocks = num_workers;
-  int threads_per_block = 1;
+void ansB(int* data, int nsize, int num_workers){
+  int num_blocks = 1;
+  int threads_per_block = num_workers;
+
   int* dd;
   int is_sorted = 1;
   int *dsorted;
