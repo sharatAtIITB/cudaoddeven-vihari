@@ -1,4 +1,7 @@
-void serial(int* a, int n){
+#include "utils.h"
+extern __device__ __host__ inline void swap(int a[], int i, int j);
+
+__device__ __host__ void sort(int* a, int n){
   int is_sorted = 1;
   do{
     is_sorted = 1;

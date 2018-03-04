@@ -29,7 +29,7 @@
 #ifdef DEBUG
 const int RMAX = 100;
 #else
-const int RMAX = 10000000; // 10 million
+const int RMAX = 10000000; // 100 million
 #endif
 
 int num_threads;
@@ -37,6 +37,7 @@ int num_threads;
 //extern void serial(int* a, int nsize);
 extern void ansA(int* a, int nsize, int num_threads);
 extern void ansB(int* a, int nsize, int num_threads);
+extern void ansE(int* a, int nsize, int num_threads);
 
 void Usage(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p);
@@ -168,7 +169,7 @@ void Read_list(int a[], int n) {
 void Odd_even(int a[], int n) {
   //serial(a, n);
   //ansA(a, n, num_threads);
-  ansB(a, n, num_threads);
+  ansE(a, n, num_threads);
   
 }  /* Odd_even */
 
