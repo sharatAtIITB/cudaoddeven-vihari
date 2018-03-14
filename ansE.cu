@@ -61,16 +61,11 @@ __global__ void oe_merge(int* data, int n, int odd){
     else nbr = tid + 1;
   }
   if (nbr<0 || nbr*ITEMS_PER_THREAD>=n){
-    /*int _k = tid*ITEMS_PER_THREAD;
-    for (int j=0;j<ITEMS_PER_THREAD;j++)
-    out[j+_k] = data[j+_k];*/
     return;
   }
   if (tid<nbr)
     exchange(data, tid*ITEMS_PER_THREAD, nbr*ITEMS_PER_THREAD);
-  //else
-  // exchange(data, tid*ITEMS_PER_THREAD, nbr*ITEMS_PER_THREAD, 1, sorted, out);
-}
+  }
 
 void ansE(int* data, int nsize, int num_workers){
   int num_blocks = 16;
