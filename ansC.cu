@@ -3,14 +3,31 @@
 
 extern __device__ __host__ inline void swap(int a[], int i, int j);
 
-__global__ void _ansC(int* data, int n, int* sorted, int odd){
+__global__ void _ansC(int* data, int n){
+  __shared__ int odd;
+  __shared__ int i;
   int tid = blockDim.x * blockIdx.x + threadIdx.x;
-  if (tid%2 != odd)
-    return;
-  if (tid<n && data[tid]>data[tid+1]){
-    swap(data, tid, tid+1);
-    *sorted = 0;
+  if (tid == 0){
+    odd = 0;
+    i = 0;
   }
+  __syncthreads();
+
+  while (true){
+    if (i>=n)
+      return;
+    
+    if (tid%2==odd)
+      if (tid<n && data[tid]>data[tid+1])
+	swap(data, tid, tid+1);
+
+    __syncthreads();
+    if (tid == 0){
+      odd = !odd;
+      i += 1;
+    }
+  }
+
 }
 
 void ansC(int* data, int nsize, int num_workers){
@@ -18,23 +35,12 @@ void ansC(int* data, int nsize, int num_workers){
   int threads_per_block = num_workers;
 
   int* dd;
-  int is_sorted = 1;
-  int *dsorted;
-  cudaMalloc(&dsorted, 1 * sizeof(int));
-  cudaMemset(dsorted, 1, sizeof(int));
-  checkErrors("Failed to set");
-
   cudaMalloc(&dd, nsize * sizeof(int));
   checkErrors("Failed to allocate");
   cudaMemcpy(dd, data, nsize * sizeof(int), cudaMemcpyHostToDevice);
   checkErrors("Failed to copy");
 
-  do{
-    cudaMemset(dsorted, 1, sizeof(int));
-    _ansA <<< num_blocks, threads_per_block>>> (dd, nsize, dsorted, 0);
-    checkErrors("Failed to allocate");
-    _ansA <<< num_blocks, threads_per_block>>> (dd, nsize, dsorted, 1);
-    cudaMemcpy(&is_sorted, dsorted, sizeof(int), cudaMemcpyDeviceToHost);
-  }while(is_sorted==0);
+  _ansC <<<num_blocks, threads_per_block>>> (dd, nsize);
+  cudaDeviceSynchronize();
   cudaMemcpy(data, dd, sizeof(int)*nsize, cudaMemcpyDeviceToHost);
 }

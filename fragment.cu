@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <omp.h>
 #include "timer.h"
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
 const int RMAX = 100;
 #else
@@ -37,6 +37,7 @@ int num_threads;
 //extern void serial(int* a, int nsize);
 extern void ansA(int* a, int nsize, int num_threads);
 extern void ansB(int* a, int nsize, int num_threads);
+extern void ansC(int* a, int nsize, int num_threads);
 extern void ansE(int* a, int nsize, int num_threads);
 //extern __device__ __host__ void sort(int a[], int n);
 
@@ -170,7 +171,7 @@ void Read_list(int a[], int n) {
 void Odd_even(int a[], int n) {
   //serial(a, n);
   //ansA(a, n, num_threads);
-  ansE(a, n, num_threads);
+  ansC(a, n, num_threads);
   //sort(a, 5);
 }  /* Odd_even */
 
