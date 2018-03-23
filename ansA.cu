@@ -13,8 +13,8 @@ __global__ void _ansA(int* data, int n, int* sorted, int odd){
   }
 }
 
-void ansA(int* data, int nsize, int num_workers){
-  int num_blocks = num_workers;
+void ansA(int* data, int nsize){
+  int num_blocks = nsize;
   int threads_per_block = 1;
   int* dd;
   int is_sorted = 1;
@@ -31,8 +31,11 @@ void ansA(int* data, int nsize, int num_workers){
   do{
     cudaMemset(dsorted, 1, sizeof(int));
     _ansA <<< num_blocks, threads_per_block>>> (dd, nsize, dsorted, 0);
+    checkErrors("Could not make kernel launch");
     _ansA <<< num_blocks, threads_per_block>>> (dd, nsize, dsorted, 1);
+    checkErrors("Could not make kernel launch");
     cudaMemcpy(&is_sorted, dsorted, sizeof(int), cudaMemcpyDeviceToHost);
+    checkErrors("Failed to copy from device");
   }while(is_sorted==0);
   cudaMemcpy(data, dd, sizeof(int)*nsize, cudaMemcpyDeviceToHost);
 }
