@@ -170,8 +170,8 @@ void Read_list(int a[], int n) {
  */
 void Odd_even(int a[], int n) {
   //serial(a, n);
-  //ansA(a, n, num_threads);
-  ansC(a, n, num_threads);
+  ansA(a, n);
+  //ansC(a, n, num_threads);
   //sort(a, 5);
 }  /* Odd_even */
 
